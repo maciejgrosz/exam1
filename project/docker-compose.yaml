@@ -1,0 +1,42 @@
+
+version: '3.7'
+services:
+  gutendex:
+    image: gutendex_image
+    container_name: gutendex
+    networks:
+      - gutendex_net
+    ports:
+      - 5000:5000
+    # depends_on:
+    #   postgres:
+    #     condition: service_healthy
+
+  postgres:
+    image: postgres:14.5
+    container_name: postgres
+    networks:
+      - gutendex_net
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db/init_user_db.sh:/docker-entrypoint-initdb.d/init_user_db.sh
+      - db_data:/var/lib/postgresql/data
+    # healthcheck:
+    #   test: ["CMD-SHELL","pg_isready -U app -d mydb"]
+    #   interval: 5s
+    #   timeout: 5s
+    #   retries: 5
+    environment:
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: gutendex
+      POSTGRES_DB: gutendex
+
+
+networks:
+  gutendex_net:
+    name: gutendex_net
+
+volumes:
+  db_data:
+    name: db_data
