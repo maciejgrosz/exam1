@@ -4,4 +4,4 @@ WORKDIR app
 COPY . .
 # RUN apk add libpq-dev python3-dev
 RUN pip install -r requirements.txt
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["python",  "manage.py", "migrate"]
