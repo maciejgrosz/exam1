@@ -1,4 +1,4 @@
 docker rm -f $(docker ps -aq)
-docker rmi gutendex_image:latest
-docker build -t gutendex_image .
+docker rmi project_gutendex_app
+docker-compose down
 docker-compose up
