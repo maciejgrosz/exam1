@@ -4,10 +4,10 @@ services:
   gutendex_app:
     build: .
     container_name: gutendex_app
-    networks:
-      - gutendex_net
     ports:
       - 8000:8000
+    networks:
+      - gutendex_net
     depends_on:
       gutendex:
         condition: service_healthy 
@@ -19,11 +19,12 @@ services:
     container_name: gutendex
     networks:
       - gutendex_net
-    ports:
-      - 5432:5432
     volumes:
       - ./db/init_user_db.sh:/docker-entrypoint-initdb.d/init_user_db.sh
       - db_data:/var/lib/postgresql/data
+      - static_vol:/var/www/gutendex/static-root
+    ports:
+      - 5432:5432
     healthcheck:
       test: ["CMD-SHELL","pg_isready -U gutendex -d gutendex"]
       interval: 5s
@@ -34,6 +35,20 @@ services:
       POSTGRES_USER: gutendex
       POSTGRES_DB: gutendex
 
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx:/etc/nginx
+      - ./gutendex/templates:/usr/share/nginx/html/
+      # - static_vol:/usr/share/nginx/html/static
+      - ./static:/usr/share/nginx/html/static
+    ports:
+      - "8081:80"
+    depends_on:
+      - gutendex_app
+    networks:
+      - gutendex_net
+
 
 networks:
   gutendex_net:
@@ -42,3 +57,5 @@ networks:
 volumes:
   db_data:
     name: db_data
+  static_vol:
+    name: static_vol
